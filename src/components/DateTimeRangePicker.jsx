@@ -23,9 +23,23 @@ function isDateTimeBefore(d1, t1, d2, t2) {
 
 export default function DateTimeRangePicker({ hour12 = true, minuteStep = 1 }) {
   // Example state for month picker
-  const [monthValue, setMonthValue] = useState({ month: new Date().getMonth() });
+  // const [monthValue, setMonthValue] = useState({ month: new Date().getMonth() });
+  // Updated state for month and date picker
+  const [monthDateValue, setMonthDateValue] = useState({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(),
+    date: new Date().getDate(),
+  });
+  // Add view state for month picker
+  const [monthPickerView, setMonthPickerView] = useState("date"); // "month" or "date"
   // Example state for month-year picker
-  const [monthYearValue, setMonthYearValue] = useState({ month: new Date().getMonth(), year: new Date().getFullYear() });
+  // State for month-year-date picker
+  const [monthYearPickerView, setMonthYearPickerView] = useState("date"); // "year", "month", or "date"
+  const [monthYearDateValue, setMonthYearDateValue] = useState({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(),
+    date: new Date().getDate(),
+  });
 
   // --- Existing calendar logic for backward compatibility ---
   const today = new Date();
@@ -115,21 +129,127 @@ export default function DateTimeRangePicker({ hour12 = true, minuteStep = 1 }) {
     <div className="calendar-grid-container">
       <div className="calendar-grid-item">
         <h3>Month Picker Example</h3>
-        <Calendar
-          mode="month"
-          value={monthValue}
-          onChange={setMonthValue}
-        />
-        <div style={{fontSize: '0.95em', marginTop: 8}}>Selected Month: {monthValue.month + 1}</div>
+        {monthPickerView === "month" ? (
+          // Month selection view
+          <Calendar
+            mode="month"
+            value={{ month: monthDateValue.month, year: monthDateValue.year }}
+            onChange={({ month, year }) => {
+              setMonthDateValue((prev) => ({
+                ...prev,
+                month: month !== undefined ? month : prev.month,
+                year: year !== undefined ? year : prev.year,
+              }));
+              setMonthPickerView("date");
+            }}
+          />
+        ) : (
+          // Date selection view
+          <Calendar
+            year={monthDateValue.year}
+            month={monthDateValue.month}
+            firstDay={getFirstDayOfMonth(monthDateValue.year, monthDateValue.month)}
+            daysInMonth={getDaysInMonth(monthDateValue.year, monthDateValue.month)}
+            startDate={new Date(monthDateValue.year, monthDateValue.month, monthDateValue.date)}
+            isSameDate={(d, y, m, day) => d && d.getFullYear() === y && d.getMonth() === m && d.getDate() === day}
+            isInRange={() => false}
+            isDisabledDate={() => false}
+            handleDateClick={(day) => {
+              setMonthDateValue((prev) => ({
+                ...prev,
+                date: day,
+              }));
+            }}
+            handleMonthChange={(offset) => {
+              const newMonth = new Date(monthDateValue.year, monthDateValue.month + offset);
+              setMonthDateValue((prev) => ({
+                ...prev,
+                year: newMonth.getFullYear(),
+                month: newMonth.getMonth(),
+              }));
+            }}
+            setView={(view) => {
+              if (view === VIEW.MONTH) setMonthPickerView("month");
+            }}
+            VIEW={VIEW}
+            currentDate={new Date(monthDateValue.year, monthDateValue.month)}
+          />
+        )}
+        <div style={{fontSize: '0.95em', marginTop: 8}}>
+          Selected: {monthDateValue.month + 1}/{monthDateValue.date}/{monthDateValue.year}
+        </div>
       </div>
       <div className="calendar-grid-item">
         <h3>Month-Year Picker Example</h3>
-        <Calendar
-          mode="month-year"
-          value={monthYearValue}
-          onChange={setMonthYearValue}
-        />
-        <div style={{fontSize: '0.95em', marginTop: 8}}>Selected: {monthYearValue.month + 1}/{monthYearValue.year}</div>
+        {monthYearPickerView === "year" ? (
+          <Calendar
+            mode="month-year"
+            value={{ month: monthYearDateValue.month, year: monthYearDateValue.year }}
+            onChange={({ year, month, decadeNav }) => {
+              setMonthYearDateValue((prev) => ({
+                ...prev,
+                year: year !== undefined ? year : prev.year,
+                month: month !== undefined ? month : prev.month,
+              }));
+              if (!decadeNav) {
+                setMonthYearPickerView("month");
+              }
+            }}
+            setView={(view) => {
+              if (view === VIEW.MONTH) setMonthYearPickerView("month");
+              if (view === VIEW.YEAR) setMonthYearPickerView("year");
+            }}
+            VIEW={VIEW}
+            view={monthYearPickerView}
+          />
+        ) : monthYearPickerView === "month" ? (
+          <Calendar
+            mode="month-year"
+            value={{ month: monthYearDateValue.month, year: monthYearDateValue.year }}
+            onChange={({ month }) => {
+              setMonthYearDateValue((prev) => ({ ...prev, month: month !== undefined ? month : prev.month }));
+              setMonthYearPickerView("date");
+            }}
+            setView={(view) => {
+              if (view === VIEW.MONTH) setMonthYearPickerView("month");
+              if (view === VIEW.YEAR) setMonthYearPickerView("year");
+            }}
+            VIEW={VIEW}
+            view={monthYearPickerView}
+          />
+        ) : (
+          <Calendar
+            year={monthYearDateValue.year}
+            month={monthYearDateValue.month}
+            firstDay={getFirstDayOfMonth(monthYearDateValue.year, monthYearDateValue.month)}
+            daysInMonth={getDaysInMonth(monthYearDateValue.year, monthYearDateValue.month)}
+            startDate={new Date(monthYearDateValue.year, monthYearDateValue.month, monthYearDateValue.date)}
+            isSameDate={(d, y, m, day) => d && d.getFullYear() === y && d.getMonth() === m && d.getDate() === day}
+            isInRange={() => false}
+            isDisabledDate={() => false}
+            handleDateClick={(day) => {
+              setMonthYearDateValue((prev) => ({ ...prev, date: day }));
+            }}
+            handleMonthChange={(offset) => {
+              const newMonth = new Date(monthYearDateValue.year, monthYearDateValue.month + offset);
+              setMonthYearDateValue((prev) => ({
+                ...prev,
+                year: newMonth.getFullYear(),
+                month: newMonth.getMonth(),
+              }));
+            }}
+            setView={(view) => {
+              if (view === VIEW.MONTH) setMonthYearPickerView("month");
+              if (view === VIEW.YEAR) setMonthYearPickerView("year");
+            }}
+            VIEW={VIEW}
+            currentDate={new Date(monthYearDateValue.year, monthYearDateValue.month)}
+            view={monthYearPickerView}
+          />
+        )}
+        <div style={{fontSize: '0.95em', marginTop: 8}}>
+          Selected: {monthYearDateValue.month + 1}/{monthYearDateValue.date}/{monthYearDateValue.year}
+        </div>
       </div>
       <div className="calendar-grid-item calendar-grid-full">
         <h3>Full Calendar (Backward Compatible)</h3>

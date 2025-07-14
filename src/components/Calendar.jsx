@@ -20,6 +20,7 @@ export default function Calendar({
   setView,
   VIEW,
   currentDate,
+  view, // NEW: allow parent to control view for month-year mode
   ...rest
 }) {
   // Internal state for month/year pickers if not controlled
@@ -33,6 +34,10 @@ export default function Calendar({
     : internalDate;
   const displayYear = date.getFullYear();
   const displayMonth = date.getMonth();
+
+  // For month-year mode, use parent view if provided, else fallback to internal state
+  const [monthYearInternalView, setMonthYearInternalView] = useState("month");
+  const effectiveMonthYearView = view || monthYearInternalView;
 
   // Month Picker Mode
   if (mode === "month") {
@@ -103,12 +108,11 @@ export default function Calendar({
 
   // Month-Year Picker Mode
   if (mode === "month-year") {
-    const [view, setView] = useState("month"); // 'month' or 'year'
     const baseYear = Math.floor(displayYear / 10) * 10;
     const years = Array.from({ length: 12 }, (_, i) => baseYear - 1 + i);
     return (
       <div className="month-year-view">
-        {view === "month" && (
+        {effectiveMonthYearView === "month" && (
           <div className="month-view">
             <div className="header">
               <div
@@ -132,8 +136,8 @@ export default function Calendar({
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => setView("year")}
-                onKeyDown={e => (e.key === "Enter" || e.key === " ") && setView("year")}
+                onClick={() => setView ? setView(VIEW.YEAR) : setMonthYearInternalView("year")}
+                onKeyDown={e => (e.key === "Enter" || e.key === " ") && (setView ? setView(VIEW.YEAR) : setMonthYearInternalView("year"))}
                 style={{ cursor: "pointer" }}
               >
                 {displayYear}
@@ -179,7 +183,7 @@ export default function Calendar({
             </div>
           </div>
         )}
-        {view === "year" && (
+        {effectiveMonthYearView === "year" && (
           <div className="year-view">
             <div className="header">
               <div
@@ -188,9 +192,15 @@ export default function Calendar({
                 tabIndex={0}
                 aria-label="Previous decade"
                 onClick={() => {
-                  setInternalDate(new Date(baseYear - 10, displayMonth));
+                  if (onChange) {
+                    onChange({ year: baseYear - 10, month: displayMonth, decadeNav: true });
+                  } else {
+                    setInternalDate(new Date(baseYear - 10, displayMonth));
+                  }
                 }}
-                onKeyDown={e => (e.key === "Enter" || e.key === " ") && setInternalDate(new Date(baseYear - 10, displayMonth))}
+                onKeyDown={e => (e.key === "Enter" || e.key === " ") && (
+                  onChange ? onChange({ year: baseYear - 10, month: displayMonth, decadeNav: true }) : setInternalDate(new Date(baseYear - 10, displayMonth))
+                )}
               >
                 ❮
               </div>
@@ -201,9 +211,15 @@ export default function Calendar({
                 tabIndex={0}
                 aria-label="Next decade"
                 onClick={() => {
-                  setInternalDate(new Date(baseYear + 10, displayMonth));
+                  if (onChange) {
+                    onChange({ year: baseYear + 10, month: displayMonth, decadeNav: true });
+                  } else {
+                    setInternalDate(new Date(baseYear + 10, displayMonth));
+                  }
                 }}
-                onKeyDown={e => (e.key === "Enter" || e.key === " ") && setInternalDate(new Date(baseYear + 10, displayMonth))}
+                onKeyDown={e => (e.key === "Enter" || e.key === " ") && (
+                  onChange ? onChange({ year: baseYear + 10, month: displayMonth, decadeNav: true }) : setInternalDate(new Date(baseYear + 10, displayMonth))
+                )}
               >
                 ❯
               </div>
@@ -217,12 +233,12 @@ export default function Calendar({
                   tabIndex={0}
                   onClick={() => {
                     setInternalDate(new Date(y, displayMonth));
-                    setView("month");
+                    if (setView) setView(VIEW.MONTH); else setMonthYearInternalView("month");
                     onChange && onChange({ month: displayMonth, year: y });
                   }}
                   onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
                     setInternalDate(new Date(y, displayMonth));
-                    setView("month");
+                    if (setView) setView(VIEW.MONTH); else setMonthYearInternalView("month");
                     onChange && onChange({ month: displayMonth, year: y });
                   })()}
                 >
