@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Calendar from "./Calendar";
-import MonthView from "./MonthView";
-import YearView from "./YearView";
 import DateInput from "./DateInput";
 
 const VIEW = {
@@ -9,7 +7,6 @@ const VIEW = {
   MONTH: "month",
   YEAR: "year",
 };
-
 
 function isDateTimeBefore(d1, t1, d2, t2) {
   if (!d1 || !t1 || !d2 || !t2) return false;
@@ -25,16 +22,18 @@ function isDateTimeBefore(d1, t1, d2, t2) {
 }
 
 export default function DateTimeRangePicker({ hour12 = true, minuteStep = 1 }) {
+  // Example state for month picker
+  const [monthValue, setMonthValue] = useState({ month: new Date().getMonth() });
+  // Example state for month-year picker
+  const [monthYearValue, setMonthYearValue] = useState({ month: new Date().getMonth(), year: new Date().getFullYear() });
+
+  // --- Existing calendar logic for backward compatibility ---
   const today = new Date();
-  const [view, setView] = useState(VIEW.CALENDAR);
+  const [fullCalendarView, setFullCalendarView] = useState(VIEW.CALENDAR); // NEW: manage view for full calendar
   const [currentDate, setCurrentDate] = useState(new Date(today));
   const [selecting, setSelecting] = useState("start");
-
-  // Date state only
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-
-  // Calendar helpers
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
   const isSameDate = (d, y, m, day) => d && d.getFullYear() === y && d.getMonth() === m && d.getDate() === day;
@@ -49,16 +48,6 @@ export default function DateTimeRangePicker({ hour12 = true, minuteStep = 1 }) {
     if (selected < startDate) return true;
     return false;
   };
-  const isDisabledMonth = (year, month) => {
-    if (selecting !== "end" || !startDate) return false;
-    return new Date(year, month, 1) < new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-  };
-  const isDisabledYear = (year) => {
-    if (selecting !== "end" || !startDate) return false;
-    return year < startDate.getFullYear();
-  };
-
-  // Calendar navigation
   const handleDateClick = (day) => {
     const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     if (selecting === "start") {
@@ -75,22 +64,6 @@ export default function DateTimeRangePicker({ hour12 = true, minuteStep = 1 }) {
     newDate.setMonth(currentDate.getMonth() + offset);
     setCurrentDate(newDate);
   };
-  const handleMonthSelect = (month) => {
-    if (isDisabledMonth(currentDate.getFullYear(), month)) return;
-    const newDate = new Date(currentDate);
-    newDate.setMonth(month);
-    setCurrentDate(newDate);
-    setView(VIEW.CALENDAR);
-  };
-  const handleYearSelect = (year) => {
-    if (isDisabledYear(year)) return;
-    const newDate = new Date(currentDate);
-    newDate.setFullYear(year);
-    setCurrentDate(newDate);
-    setView(VIEW.MONTH);
-  };
-
-  // Sync calendar view with selection
   useEffect(() => {
     if (selecting === "start" && startDate) {
       setCurrentDate(new Date(startDate));
@@ -100,8 +73,6 @@ export default function DateTimeRangePicker({ hour12 = true, minuteStep = 1 }) {
       setCurrentDate(new Date(startDate));
     }
   }, [selecting, startDate, endDate]);
-
-  // Reset handlers
   const handleClearStart = () => {
     setStartDate(null);
     setEndDate(null);
@@ -112,79 +83,159 @@ export default function DateTimeRangePicker({ hour12 = true, minuteStep = 1 }) {
     setSelecting("end");
   };
 
+  // Handlers for switching views in full calendar
+  const handleSetMonthView = () => setFullCalendarView(VIEW.MONTH);
+  const handleSetYearView = () => setFullCalendarView(VIEW.YEAR);
+  const handleSetCalendarView = () => setFullCalendarView(VIEW.CALENDAR);
+
+  // Handler for selecting a month in month picker view
+  const handleFullCalendarMonthSelect = ({ month }) => {
+    const newDate = new Date(currentDate.getFullYear(), month);
+    setCurrentDate(newDate);
+    setFullCalendarView(VIEW.CALENDAR);
+  };
+  // Handler for selecting a month+year in year picker view
+  const handleFullCalendarMonthYearSelect = ({ month, year }) => {
+    const newDate = new Date(year, month);
+    setCurrentDate(newDate);
+    setFullCalendarView(VIEW.CALENDAR);
+  };
+  // Handler for selecting a year in year picker view
+  const handleFullCalendarYearSelect = (year) => {
+    const newDate = new Date(year, currentDate.getMonth());
+    setCurrentDate(newDate);
+    setFullCalendarView(VIEW.MONTH);
+  };
+
+  // For year picker (decade grid)
+  const decadeStart = Math.floor(currentDate.getFullYear() / 10) * 10;
+  const years = Array.from({ length: 12 }, (_, i) => decadeStart - 1 + i);
+
   return (
-    <div className="date-time-picker">
-      <div className="input-fields">
-        <div className="input-pill-group">
-          <DateInput
-            label="Start"
-            selected={selecting === "start"}
-            name="date-range-select"
-            onChange={() => setSelecting("start")}
-            value={startDate ? startDate.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }) : null}
-            onClear={handleClearStart}
-            className="left"
-          />
-          <DateInput
-            label="End"
-            selected={selecting === "end"}
-            name="date-range-select"
-            onChange={() => setSelecting("end")}
-            value={endDate ? endDate.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }) : null}
-            onClear={handleClearEnd}
-            className="right"
-          />
-        </div>
+    <div className="calendar-grid-container">
+      <div className="calendar-grid-item">
+        <h3>Month Picker Example</h3>
+        <Calendar
+          mode="month"
+          value={monthValue}
+          onChange={setMonthValue}
+        />
+        <div style={{fontSize: '0.95em', marginTop: 8}}>Selected Month: {monthValue.month + 1}</div>
       </div>
-      <div className="calendar-time-container">
-        <div>
-          <div className={`picker-body view-${view}`}>
-            {view === VIEW.CALENDAR && (
-              <Calendar
-                year={currentDate.getFullYear()}
-                month={currentDate.getMonth()}
-                firstDay={getFirstDayOfMonth(currentDate.getFullYear(), currentDate.getMonth())}
-                daysInMonth={getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth())}
-                startDate={startDate}
-                endDate={endDate}
-                isSameDate={isSameDate}
-                isInRange={isInRange}
-                isDisabledDate={isDisabledDate}
-                handleDateClick={handleDateClick}
-                handleMonthChange={handleMonthChange}
-                setView={setView}
-                VIEW={VIEW}
-                currentDate={currentDate}
-              />
-            )}
-            {view === VIEW.MONTH && (
-              <MonthView
-                year={currentDate.getFullYear()}
-                currentDate={currentDate}
-                setCurrentDate={setCurrentDate}
-                handleMonthSelect={handleMonthSelect}
-                isDisabledMonth={isDisabledMonth}
-              />
-            )}
-            {view === VIEW.YEAR && (
-              <YearView
-                baseYear={Math.floor(currentDate.getFullYear() / 10) * 10}
-                years={Array.from({ length: 12 }, (_, i) => Math.floor(currentDate.getFullYear() / 10) * 10 - 1 + i)}
-                currentDate={currentDate}
-                setCurrentDate={setCurrentDate}
-                handleYearSelect={handleYearSelect}
-                isDisabledYear={isDisabledYear}
-              />
-            )}
+      <div className="calendar-grid-item">
+        <h3>Month-Year Picker Example</h3>
+        <Calendar
+          mode="month-year"
+          value={monthYearValue}
+          onChange={setMonthYearValue}
+        />
+        <div style={{fontSize: '0.95em', marginTop: 8}}>Selected: {monthYearValue.month + 1}/{monthYearValue.year}</div>
+      </div>
+      <div className="calendar-grid-item calendar-grid-full">
+        <h3>Full Calendar (Backward Compatible)</h3>
+        <div className="input-fields">
+          <div className="input-pill-group">
+            <DateInput
+              label="Start"
+              selected={selecting === "start"}
+              name="date-range-select"
+              onChange={() => setSelecting("start")}
+              value={startDate ? startDate.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }) : null}
+              onClear={handleClearStart}
+              className="left"
+            />
+            <DateInput
+              label="End"
+              selected={selecting === "end"}
+              name="date-range-select"
+              onChange={() => setSelecting("end")}
+              value={endDate ? endDate.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }) : null}
+              onClear={handleClearEnd}
+              className="right"
+            />
           </div>
         </div>
-      </div>
-      {/* Validation message for invalid range */}
-      {startDate && endDate && !isDateTimeBefore(startDate, { hour: "12", minute: "00", ampm: "AM" }, endDate, { hour: "12", minute: "00", ampm: "AM" }) && (
-        <div className="validation-error" style={{ color: 'red', marginTop: 12 }}>
-          End date must be after start date.
+        <div className="calendar-time-container">
+          <div>
+            <div className={`picker-body view-${fullCalendarView}`}>
+              {fullCalendarView === VIEW.CALENDAR && (
+                <Calendar
+                  year={currentDate.getFullYear()}
+                  month={currentDate.getMonth()}
+                  firstDay={getFirstDayOfMonth(currentDate.getFullYear(), currentDate.getMonth())}
+                  daysInMonth={getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth())}
+                  startDate={startDate}
+                  endDate={endDate}
+                  isSameDate={isSameDate}
+                  isInRange={isInRange}
+                  isDisabledDate={isDisabledDate}
+                  handleDateClick={handleDateClick}
+                  handleMonthChange={handleMonthChange}
+                  setView={(view) => {
+                    if (view === VIEW.MONTH) handleSetMonthView();
+                    else if (view === VIEW.YEAR) handleSetYearView();
+                  }}
+                  VIEW={VIEW}
+                  currentDate={currentDate}
+                />
+              )}
+              {fullCalendarView === VIEW.MONTH && (
+                <Calendar
+                  mode="month"
+                  value={{ month: currentDate.getMonth(), year: currentDate.getFullYear() }}
+                  onChange={handleFullCalendarMonthSelect}
+                />
+              )}
+              {fullCalendarView === VIEW.YEAR && (
+                <div className="year-view">
+                  <div className="header">
+                    <div
+                      className="nav-btn"
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Previous decade"
+                      onClick={() => setCurrentDate(new Date(decadeStart - 10, currentDate.getMonth()))}
+                      onKeyDown={e => (e.key === "Enter" || e.key === " ") && setCurrentDate(new Date(decadeStart - 10, currentDate.getMonth()))}
+                    >
+                      ❮
+                    </div>
+                    <div>{`${decadeStart} - ${decadeStart + 9}`}</div>
+                    <div
+                      className="nav-btn"
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Next decade"
+                      onClick={() => setCurrentDate(new Date(decadeStart + 10, currentDate.getMonth()))}
+                      onKeyDown={e => (e.key === "Enter" || e.key === " ") && setCurrentDate(new Date(decadeStart + 10, currentDate.getMonth()))}
+                    >
+                      ❯
+                    </div>
+                  </div>
+                  <div className="year-grid">
+                    {years.map((y) => (
+                      <div
+                        key={y}
+                        className={`year${currentDate.getFullYear() === y ? " selected" : ""}`}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => handleFullCalendarYearSelect(y)}
+                        onKeyDown={e => (e.key === "Enter" || e.key === " ") && handleFullCalendarYearSelect(y)}
+                      >
+                        {y}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      )}
+        {startDate && endDate && !isDateTimeBefore(startDate, { hour: "12", minute: "00", ampm: "AM" }, endDate, { hour: "12", minute: "00", ampm: "AM" }) && (
+          <div className="validation-error" style={{ color: 'red', marginTop: 12 }}>
+            End date must be after start date.
+          </div>
+        )}
+      </div>
     </div>
   );
 } 

@@ -1,475 +1,189 @@
-body,
-html,
-#root {
-  height: 100%;
+/* === Modern Responsive Calendar & Picker Styles (Improved) === */
+
+body, html, #root {
+  min-height: 100vh;
+  width: 100vw;
   margin: 0;
   padding: 0;
-  width: 100%;
-  min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, sans-serif;
-}
-
-body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
   background: #f5f7fa;
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: #2d3748;
-}
-
-#root {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
-
-/* Modern, clean date-time picker with improved usability */
 
 .date-time-picker {
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
-  font-family: "Segoe UI", "Roboto", Arial, sans-serif;
-  transition: box-shadow 0.2s;
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.08);
   border: 1.5px solid #e3e8ef;
+  margin: 2vw auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  width: 100%;
+  max-width: 480px;
   box-sizing: border-box;
-}
-
-.input-fields {
+  transition: box-shadow 0.2s;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 18px;
-  gap: 16px;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.input-label {
-  background: #fff;
-  padding: 10px 14px;
-  border-radius: 8px;
-  flex: 1;
-  font-size: 1rem;
-  cursor: pointer;
+@media (min-width: 700px) {
+  .date-time-picker {
+    max-width: 650px;
+    padding: clamp(2rem, 4vw, 3rem);
+  }
+}
+@media (min-width: 1024px) {
+  .date-time-picker {
+    max-width: 900px;
+    padding: clamp(2.5rem, 5vw, 4rem);
+  }
+}
+
+/* Calendar grid modern layout */
+.calendar, .month-view, .year-view {
+  width: 100%;
+  margin: 0 auto;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1.5px solid #d1d5db;
-  box-shadow: 0 1px 2px rgba(33, 150, 243, 0.04);
-  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
-  min-height: 44px;
-  color: #222b45;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.input-label:last-child {
-  margin-right: 0;
-}
-
-.input-label.active,
-.input-label:focus {
-  border: 2px solid #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.13);
-  background: #e0e7ff;
-  color: #1e3a8a;
-}
-
-.clear-btn {
-  background: transparent;
-  border: none;
-  font-size: 1.2rem;
-  color: #9ca3af;
-  cursor: pointer;
-  margin-left: 10px;
-  border-radius: 50%;
-  transition: background 0.15s, color 0.15s;
-  padding: 2px 6px;
-}
-.clear-btn:hover,
-.clear-btn:focus {
-  background: #e0e7ff;
-  color: #2563eb;
-}
-
-.calendar-header {
+.calendar .header, .month-view .header, .year-view .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding: 0 4px;
-}
-
-.calendar-title {
-  font-size: 15px;
   font-weight: 600;
+  font-size: clamp(1rem, 2vw, 1.3rem);
   color: #1e293b;
-  cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: all 0.15s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  margin-bottom: 0.5rem;
+  gap: 0.5rem;
 }
 
-.calendar-title:hover {
-  background-color: #f1f5f9;
-}
-
-.calendar-title svg {
-  width: 16px;
-  height: 16px;
-  color: #64748b;
-}
-
-.calendar-nav {
-  display: flex;
-  gap: 8px;
-}
-
-.calendar-nav button {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #475569;
-  transition: all 0.15s ease;
-  padding: 0;
-}
-
-.calendar-nav button:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e0;
-  color: #334155;
-}
-
-.calendar-nav button:active {
-  background-color: #f1f5f9;
-}
-
-.calendar-nav button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: #f8fafc;
-}
-
-.calendar-nav button svg {
-  width: 18px;
-  height: 18px;
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  padding: 4px;
-}
-
-.weekday {
-  font-size: 12px;
-  color: #64748b;
-  text-align: center;
-  padding: 12px 0 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 500;
-}
-
-.day:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e0;
-}
-
-.day.today {
-  font-weight: 600;
-  color: #3b82f6;
-  border-color: #bfdbfe;
-  background-color: #eff6ff;
-}
-
-.day.selected {
-  background-color: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
-  font-weight: 500;
-}
-
-.day.in-range {
-  background-color: #eff6ff;
-  border-color: #bfdbfe;
-  border-radius: 0;
-}
-
-.day.range-start {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.day.range-end {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-.day.other-month {
-  color: #94a3b8;
-  background: #f8fafc;
-  border-color: #f1f5f9;
-}
-
-.calendar .header,
-.month-view .header,
-.year-view .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  margin-bottom: 12px;
-  font-size: 1.1rem;
-  color: #1e293b;
-}
-
-.calendar .nav-btn,
-.month-view .header button,
-.year-view .header button {
+.calendar .nav-btn, .month-view .header .nav-btn, .year-view .header .nav-btn {
   border: none;
+  background: #f1f5f9;
   color: #2563eb;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   border-radius: 50%;
-  width: 45px;
-  height: 45px;
+  width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+  box-shadow: 0 1px 4px rgba(37,99,235,0.06);
 }
 .calendar .nav-btn:hover,
-.month-view .header button:hover,
-.year-view .header button:hover {
+.month-view .header .nav-btn:hover,
+.year-view .header .nav-btn:hover {
   background: #c7d2fe;
   color: #1e3a8a;
 }
 
-.weekdays,
-.week {
-  display: flex;
-}
-
-.calendar .weekdays,
-.calendar .days {
+/* Modern grid for days, months, years */
+.calendar .weekdays, .calendar .days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
+  gap: 0.5rem;
   margin: 0;
   padding: 0;
+}
+
+.month-grid, .year-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem 0;
+  justify-items: center;
+  width: 100%;
+}
+
+@media (max-width: 500px) {
+  .calendar .weekdays, .calendar .days {
+    gap: 0.2rem;
+  }
+  .month-grid, .year-grid {
+    gap: 0.4rem 0;
+  }
 }
 
 .weekdays div {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
+  font-size: clamp(0.8rem, 2vw, 1rem);
   font-weight: 600;
   color: #475569;
+  text-align: center;
   user-select: none;
-  margin: 0;
-  padding: 0;
+  padding: 0.2rem 0;
 }
 
-.day {
-  aspect-ratio: 1;
+.day, .month, .year {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 1.5rem;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 400;
-  transition: all 0.15s ease;
-  position: relative;
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-weight: 500;
   background: #fff;
-  border: 1px solid #e2e8f0;
+  border: 1.5px solid #e2e8f0;
+  min-width: 2.2rem;
+  min-height: 2.2rem;
+  transition: all 0.18s;
+  box-sizing: border-box;
+  margin: 0.1rem auto;
+  padding: 0.2rem 0.5rem;
 }
-
-.day.start,
-.day.end {
-  background-color: #2563eb;
+.day.selected, .month.selected, .year.selected, .day.start, .day.end {
+  background: #2563eb;
   color: #fff;
-  font-weight: 600;
+  border-color: #2563eb;
+  font-weight: 700;
   z-index: 2;
 }
-
-.day.disabled {
+.day.in-range {
+  background: #e0e7ff;
+  color: #2563eb;
+  border-radius: 1.5rem;
+}
+.day.disabled, .month.disabled, .year.disabled {
   color: #cbd5e1;
   background: #f1f5f9;
   cursor: not-allowed;
   pointer-events: none;
 }
-
-.day:not(.disabled):hover,
-.month:not(.disabled):hover,
-.year:not(.disabled):hover {
+.day:not(.disabled):hover, .month:not(.disabled):hover, .year:not(.disabled):hover {
   background: #c7d2fe;
   color: #2563eb;
 }
 
-.month-grid,
-.year-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px 0;
-  justify-items: center;
-}
-
-/* --- Month and Year Grid Cell Styles --- */
-.month,
-.year {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 64px;
-  height: 36px;
-  line-height: 36px;
-  margin: 8px 0;
-  font-size: 1.08rem;
-  font-weight: 500;
-  color: #111;
-  background: none;
-  border: none;
-  border-radius: 18px;
-  cursor: pointer;
-  transition: background 0.18s, color 0.18s;
-  box-sizing: border-box;
-  outline: none;
-  user-select: none;
-}
-
-.month.selected,
-.year.selected {
-  background-color: #2563eb;
-  color: #fff;
-  font-weight: 600;
-  border-radius: 50%;
-}
-.month.current,
-.year.current {
-  background: #cce4ff;
-  color: #222;
-  font-weight: 600;
-}
-.month:not(.selected):hover,
-.year:not(.selected):hover {
-  background: #e6f0ff;
-  color: #007aff;
-}
-
-/* --- End Month and Year Grid Cell Styles --- */
-
-.month.disabled,
-.year.disabled {
-  color: #cbd5e1;
-  background: #f1f5f9;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.month:not(.disabled):hover,
-.year:not(.disabled):hover {
-  background: #c7d2fe;
-  color: #2563eb;
-}
-
-.calendar-label-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin-bottom: 6px;
-  padding: 0 2px;
-}
-.calendar-label {
-  font-weight: 600;
-  font-size: 1.08rem;
-  color: #222b45;
-  text-align: left;
-}
-
-.time-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  margin-top: 18px;
-  border-top: 1px solid #e0e7ef;
-  padding-top: 16px;
-}
-.time-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-.time-label-row {
-  font-weight: 600;
-  color: #222b45;
-  margin-bottom: 4px;
-  font-size: 1rem;
-}
-
-.month-name,
-.year-name {
-  background: none;
-  border: none;
-  color: #222b45;
-  font-size: 1.1rem;
-  font-weight: 600;
-  padding: 0 12px;
-  cursor: pointer;
-  border-radius: 6px;
-  outline: none;
-  box-shadow: none;
-  transition: background 0.15s, color 0.15s;
-}
-.month-name:focus,
-.year-name:focus {
-  outline: 2px solid #2563eb;
-}
-
-/* --- Pill Group and DateInput Styles (deduplicated) --- */
+/* Modern input pill group */
 .input-pill-group {
   display: flex;
-  width: 500px;
-  min-width: 500px;
-  max-width: 500px;
-  position: relative;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 600px;
   background: #e5e5e5;
-  border-radius: 24px;
+  border-radius: 2rem;
   box-shadow: 0 2px 8px rgba(25, 118, 210, 0.04);
   overflow: hidden;
-  padding: 1px;
+  padding: 2px;
   border: 1.5px solid #ccc;
+  margin: 0 auto 1rem auto;
+  gap: 0.5rem;
 }
 .input-pill {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  min-height: 56px;
+  min-height: 3.2rem;
   min-width: 0;
-  width: 267px;
-  max-width: 267px;
-  padding: 10px 18px 10px 18px;
-  font-size: 1rem;
+  width: 100%;
+  max-width: 100%;
+  padding: 0.7rem 1.2rem;
+  font-size: clamp(0.95rem, 2vw, 1.08rem);
   cursor: pointer;
   border: none;
   outline: none;
@@ -478,12 +192,14 @@ body {
   z-index: 1;
   position: relative;
   transition: background 0.25s, color 0.25s, box-shadow 0.25s, z-index 0.25s;
+  box-sizing: border-box;
+  border-radius: 2rem;
 }
 .input-pill.left {
-  border-radius: 24px 0 0 24px;
+  border-radius: 2rem 0 0 2rem;
 }
 .input-pill.right {
-  border-radius: 0 24px 24px 0;
+  border-radius: 0 2rem 2rem 0;
   margin-left: 0;
 }
 .input-pill.active {
@@ -498,7 +214,7 @@ body {
   box-shadow: none;
 }
 .input-pill .pill-label {
-  font-size: 0.98rem;
+  font-size: clamp(0.9rem, 2vw, 1rem);
   font-weight: 600;
   margin-bottom: 2px;
   color: inherit;
@@ -506,7 +222,7 @@ body {
 }
 .input-pill .pill-value,
 .input-pill .pill-placeholder {
-  font-size: 1.08rem;
+  font-size: clamp(0.98rem, 2vw, 1.08rem);
   font-weight: 500;
   color: inherit;
   transition: color 0.25s;
@@ -525,7 +241,7 @@ body {
 .pill-value-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.7rem;
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
@@ -533,7 +249,7 @@ body {
 .pill-clear {
   color: #bbb;
   font-size: 1.2rem;
-  margin-left: 12px;
+  margin-left: 0.7rem;
   border-radius: 50%;
   padding: 2px 7px;
   cursor: pointer;
@@ -556,12 +272,12 @@ body {
 }
 .pill-placeholder {
   color: #aaa;
-  font-size: 1.08rem;
+  font-size: clamp(0.98rem, 2vw, 1.08rem);
   font-weight: 500;
   letter-spacing: 0.01em;
 }
 .pill-value {
-  font-size: 1.08rem;
+  font-size: clamp(0.98rem, 2vw, 1.08rem);
   font-weight: 600;
   transition: color 0.2s;
   color: #222;
@@ -570,7 +286,7 @@ body {
   color: #1976d2;
 }
 .pill-datetime-inline {
-  font-size: 1.08rem;
+  font-size: clamp(0.98rem, 2vw, 1.08rem);
   font-weight: 600;
   color: inherit;
   white-space: nowrap;
@@ -583,255 +299,186 @@ body {
   display: flex;
   flex-direction: column;
 }
-.pill-highlight {
-  display: none;
-}
-/* --- End Pill Group and DateInput Styles --- */
 
-.header .nav-btn {
-  border: none;
-  background: none;
-  color: #2563eb;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1.3rem;
-  transition: background 0.18s, color 0.18s;
-}
-
-.header .nav-btn:hover {
-  background: #e6f0ff;
-  color: #007aff;
-}
-
-.timepicker-scroller {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 320px;
-  margin: 0 auto;
-  font-family: inherit;
-}
-
-.scroller-columns {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  width: 100%;
-  position: relative;
-  height: 200px;
-}
-
-.scroller-column {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 200px;
-  scroll-snap-type: y mandatory;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
-  position: relative;
-}
-.scroller-column::-webkit-scrollbar {
-  display: none;
-}
-
-.scroller-item {
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  font-size: 1.2rem;
-  scroll-snap-align: center;
-  transition: color 0.2s, opacity 0.2s, font-weight 0.2s, background 0.2s,
-    transform 0.2s;
-  opacity: 0.5;
-  cursor: pointer;
-  user-select: none;
-}
-
-.scroller-item.selected {
-  color: #1976d2;
-  font-weight: bold;
-  background: #e3f2fd;
-  border-radius: 8px;
-  opacity: 1;
-  font-size: 1.4rem;
-  z-index: 1;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
-}
-
-/* Opacity effect for items near center */
-.scroller-item {
-  /* Will be enhanced with JS for more precise effect if needed */
-}
-
-/* Center highlight overlay */
-.scroller-columns::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 40px;
-  margin-top: -20px;
-  pointer-events: none;
-  border-top: 2px solid #1976d2;
-  border-bottom: 2px solid #1976d2;
-  background: rgba(25, 118, 210, 0.04);
-  z-index: 2;
-}
-
-.timezone-label {
-  margin-top: 0.5rem;
-  font-size: 0.95rem;
-  color: #666;
-  text-align: center;
-}
-
-@media (max-width: 480px) {
-  .timepicker-scroller {
-    width: 100%;
-    min-width: 0;
-  }
-  .scroller-columns {
-    height: 160px;
-  }
-  .scroller-item,
-  .scroller-item.selected {
-    font-size: 1rem;
-    height: 32px;
-    line-height: 32px;
-  }
-  .scroller-columns::after {
-    height: 32px;
-    margin-top: -16px;
-  }
-}
-
-@media (max-width: 500px) {
-  .date-time-picker {
-    width: 100%;
-    min-width: 0;
-    padding: 1rem 0.5rem 0.8rem 0.5rem;
-  }
-  .input-fields {
-    flex-direction: column;
-    gap: 8px;
-  }
-  .input-label {
-    margin-right: 0;
-    margin-bottom: 0;
-    min-height: 40px;
-    font-size: 0.98rem;
-  }
-  .calendar .header,
-  .month-view .header,
-  .year-view .header {
-    font-size: 1rem;
-  }
-  .weekdays div,
-  .day,
-  .month,
-  .year {
-    width: 32px;
-    height: 32px;
-    line-height: 32px;
-    font-size: 0.92rem;
-  }
-  .month,
-  .year {
-    min-width: 32px;
-    min-height: 32px;
-  }
-  .time-picker {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 4px;
-  }
-  .time-label {
-    margin-bottom: 2px;
-    min-width: 0;
-  }
-  .time-controls {
-    gap: 6px;
-  }
-  .time-picker span {
-    text-align: left;
-    min-width: 0;
-  }
-}
-
-@media (max-width: 700px) {
-  .app-center {
-    align-items: flex-start;
-    justify-content: center;
-    min-height: 100vh;
-  }
-  .date-time-picker {
-    margin: 0 auto;
-  }
-  .input-fields {
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
-  }
-  .time-picker {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-  .time-picker span {
-    text-align: left;
-    min-width: 0;
-  }
-
-  #root,
-  .app-container {
-    padding: 10px;
-    justify-content: flex-start;
-    align-items: flex-start;
-  }
-  .calendar-time-container {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-}
-
-.calendar-time-container {
-  display: flex;
-  gap: 32px;
-  align-items: center; /* Center children vertically */
-  justify-content: center;
-  width: 100%;
-  box-sizing: border-box;
-}
-@media (max-width: 900px) {
-  .calendar-time-container {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-    max-width: 100vw;
-  }
-}
+/* Responsive stacking for mobile */
 @media (max-width: 600px) {
   .date-time-picker {
-    padding: 0.5rem 0.2rem 0.8rem 0.2rem;
-    min-width: 0;
-    width: 100vw;
-    box-sizing: border-box;
+    max-width: 99vw;
+    padding: 0.7rem 0.2rem 0.7rem 0.2rem;
+    border-radius: 1rem;
   }
-  .calendar-time-container {
+  .input-pill-group {
     flex-direction: column;
-    gap: 8px;
-    align-items: stretch;
-    max-width: 100vw;
+    max-width: 99vw;
+    border-radius: 1rem;
+    padding: 0.2rem;
+    gap: 0.2rem;
   }
+  .input-pill {
+    border-radius: 1rem !important;
+    min-height: 2.5rem;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    padding: 0.5rem 0.7rem;
+  }
+  .calendar, .month-view, .year-view {
+    max-width: 99vw;
+    gap: 0.5rem;
+  }
+}
+
+/* Center and contain the main grid */
+.calendar-grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1100px;
+  margin: 2rem auto;
+  box-sizing: border-box;
+  justify-items: center;
+}
+
+@media (min-width: 900px) {
+  .calendar-grid-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem 2.5rem;
+    align-items: start;
+  }
+  .calendar-grid-full {
+    grid-column: 1 / span 2;
+  }
+}
+
+.calendar-grid-item {
+  width: 100%;
+  max-width: 500px;
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.08);
+  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .calendar-grid-item {
+    max-width: 99vw;
+    padding: 1rem 0.3rem 1rem 0.3rem;
+  }
+  .calendar-grid-container {
+    gap: 1.2rem;
+  }
+}
+
+/* Card header styles */
+.calendar-grid-item h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.5px;
+}
+
+/* Month and year grid: always 3 columns */
+.month-grid, .year-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 0.7rem 0 !important;
+  justify-items: center;
+  width: 100%;
+  margin: 0 auto 0.5rem auto;
+}
+
+/* Compact calendar and picker styles */
+.date-time-picker, .calendar, .month-view, .year-view {
+  padding: 0 !important;
+  gap: 0.7rem !important;
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.calendar .header, .month-view .header, .year-view .header {
+  font-size: clamp(0.95rem, 1.5vw, 1.08rem) !important;
+  margin-bottom: 0.2rem !important;
+  gap: 0.2rem !important;
+}
+.day, .month, .year {
+  font-size: clamp(0.85rem, 1.2vw, 1rem) !important;
+  min-width: 2.2rem !important;
+  min-height: 2.2rem !important;
+  padding: 0.1rem 0.5rem !important;
+  margin: 0.05rem auto !important;
+  border-radius: 1.2rem !important;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  transition: all 0.18s;
+  box-sizing: border-box;
+}
+.day.selected, .month.selected, .year.selected, .day.start, .day.end {
+  background: #2563eb !important;
+  color: #fff !important;
+  border-color: #2563eb !important;
+  font-weight: 700 !important;
+  z-index: 2;
+}
+.day.in-range {
+  background: #e0e7ff !important;
+  color: #2563eb !important;
+  border-radius: 1.2rem !important;
+}
+.day.disabled, .month.disabled, .year.disabled {
+  color: #cbd5e1 !important;
+  background: #f1f5f9 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+.day:not(.disabled):hover, .month:not(.disabled):hover, .year:not(.disabled):hover {
+  background: #c7d2fe !important;
+  color: #2563eb !important;
+}
+
+.input-pill-group {
+  gap: 0.2rem !important;
+  padding: 0.1rem !important;
+  border-radius: 1.2rem !important;
+}
+.input-pill {
+  min-height: 2.2rem !important;
+  font-size: clamp(0.85rem, 1.2vw, 1rem) !important;
+  padding: 0.3rem 0.7rem !important;
+  border-radius: 1.2rem !important;
+}
+.pill-label, .pill-value, .pill-placeholder {
+  font-size: clamp(0.85rem, 1.2vw, 1rem) !important;
+}
+.calendar .nav-btn, .month-view .header .nav-btn, .year-view .header .nav-btn {
+  width: 2rem !important;
+  height: 2rem !important;
+  font-size: 1.1rem !important;
+}
+
+/* Remove all horizontal overflow */
+html, body, #root, .calendar-grid-container {
+  overflow-x: hidden !important;
+}
+
+/* Add pointer cursor to clickable elements */
+.calendar .month-name,
+.calendar .year-name,
+.year-view .header div,
+.month-view .header div,
+.year,
+.month,
+.day {
+  cursor: pointer !important;
+}
+
+/* Only show pointer for interactive header labels, not for static text */
+.calendar .header .month-name,
+.calendar .header .year-name {
+  cursor: pointer !important;
 }

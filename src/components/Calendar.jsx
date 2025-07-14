@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 export default function Calendar({
+  mode = "calendar", // 'month', 'month-year', or 'calendar' (default)
+  value,
+  onChange,
+  // Backward compatibility props
   year,
   month,
   firstDay,
@@ -16,7 +20,223 @@ export default function Calendar({
   setView,
   VIEW,
   currentDate,
+  ...rest
 }) {
+  // Internal state for month/year pickers if not controlled
+  const [internalDate, setInternalDate] = useState(
+    value?.year && value?.month !== undefined
+      ? new Date(value.year, value.month)
+      : new Date()
+  );
+  const date = value?.year && value?.month !== undefined
+    ? new Date(value.year, value.month)
+    : internalDate;
+  const displayYear = date.getFullYear();
+  const displayMonth = date.getMonth();
+
+  // Month Picker Mode
+  if (mode === "month") {
+    return (
+      <div className="month-view">
+        <div className="header">
+          <div
+            className="nav-btn"
+            role="button"
+            tabIndex={0}
+            aria-label="Previous year"
+            onClick={() => {
+              const newDate = new Date(displayYear - 1, displayMonth);
+              setInternalDate(newDate);
+              onChange && onChange({ month: newDate.getMonth() });
+            }}
+            onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
+              const newDate = new Date(displayYear - 1, displayMonth);
+              setInternalDate(newDate);
+              onChange && onChange({ month: newDate.getMonth() });
+            })()}
+          >
+            ❮
+          </div>
+          <div>{displayYear}</div>
+          <div
+            className="nav-btn"
+            role="button"
+            tabIndex={0}
+            aria-label="Next year"
+            onClick={() => {
+              const newDate = new Date(displayYear + 1, displayMonth);
+              setInternalDate(newDate);
+              onChange && onChange({ month: newDate.getMonth() });
+            }}
+            onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
+              const newDate = new Date(displayYear + 1, displayMonth);
+              setInternalDate(newDate);
+              onChange && onChange({ month: newDate.getMonth() });
+            })()}
+          >
+            ❯
+          </div>
+        </div>
+        <div className="month-grid">
+          {Array.from({ length: 12 }, (_, i) => (
+            <div
+              key={i}
+              className={`month${displayMonth === i ? " selected" : ""}`}
+              role="button"
+              tabIndex={0}
+              onClick={() => {
+                onChange && onChange({ month: i });
+                setInternalDate(new Date(displayYear, i));
+              }}
+              onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
+                onChange && onChange({ month: i });
+                setInternalDate(new Date(displayYear, i));
+              })()}
+            >
+              {new Date(0, i).toLocaleString("default", { month: "short" })}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Month-Year Picker Mode
+  if (mode === "month-year") {
+    const [view, setView] = useState("month"); // 'month' or 'year'
+    const baseYear = Math.floor(displayYear / 10) * 10;
+    const years = Array.from({ length: 12 }, (_, i) => baseYear - 1 + i);
+    return (
+      <div className="month-year-view">
+        {view === "month" && (
+          <div className="month-view">
+            <div className="header">
+              <div
+                className="nav-btn"
+                role="button"
+                tabIndex={0}
+                aria-label="Previous year"
+                onClick={() => {
+                  const newDate = new Date(displayYear - 1, displayMonth);
+                  setInternalDate(newDate);
+                  onChange && onChange({ month: newDate.getMonth(), year: newDate.getFullYear() });
+                }}
+                onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
+                  const newDate = new Date(displayYear - 1, displayMonth);
+                  setInternalDate(newDate);
+                  onChange && onChange({ month: newDate.getMonth(), year: newDate.getFullYear() });
+                })()}
+              >
+                ❮
+              </div>
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => setView("year")}
+                onKeyDown={e => (e.key === "Enter" || e.key === " ") && setView("year")}
+                style={{ cursor: "pointer" }}
+              >
+                {displayYear}
+              </div>
+              <div
+                className="nav-btn"
+                role="button"
+                tabIndex={0}
+                aria-label="Next year"
+                onClick={() => {
+                  const newDate = new Date(displayYear + 1, displayMonth);
+                  setInternalDate(newDate);
+                  onChange && onChange({ month: newDate.getMonth(), year: newDate.getFullYear() });
+                }}
+                onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
+                  const newDate = new Date(displayYear + 1, displayMonth);
+                  setInternalDate(newDate);
+                  onChange && onChange({ month: newDate.getMonth(), year: newDate.getFullYear() });
+                })()}
+              >
+                ❯
+              </div>
+            </div>
+            <div className="month-grid">
+              {Array.from({ length: 12 }, (_, i) => (
+                <div
+                  key={i}
+                  className={`month${displayMonth === i ? " selected" : ""}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    onChange && onChange({ month: i, year: displayYear });
+                    setInternalDate(new Date(displayYear, i));
+                  }}
+                  onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
+                    onChange && onChange({ month: i, year: displayYear });
+                    setInternalDate(new Date(displayYear, i));
+                  })()}
+                >
+                  {new Date(0, i).toLocaleString("default", { month: "short" })}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {view === "year" && (
+          <div className="year-view">
+            <div className="header">
+              <div
+                className="nav-btn"
+                role="button"
+                tabIndex={0}
+                aria-label="Previous decade"
+                onClick={() => {
+                  setInternalDate(new Date(baseYear - 10, displayMonth));
+                }}
+                onKeyDown={e => (e.key === "Enter" || e.key === " ") && setInternalDate(new Date(baseYear - 10, displayMonth))}
+              >
+                ❮
+              </div>
+              <div>{`${baseYear} - ${baseYear + 9}`}</div>
+              <div
+                className="nav-btn"
+                role="button"
+                tabIndex={0}
+                aria-label="Next decade"
+                onClick={() => {
+                  setInternalDate(new Date(baseYear + 10, displayMonth));
+                }}
+                onKeyDown={e => (e.key === "Enter" || e.key === " ") && setInternalDate(new Date(baseYear + 10, displayMonth))}
+              >
+                ❯
+              </div>
+            </div>
+            <div className="year-grid">
+              {years.map((y) => (
+                <div
+                  key={y}
+                  className={`year${displayYear === y ? " selected" : ""}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    setInternalDate(new Date(y, displayMonth));
+                    setView("month");
+                    onChange && onChange({ month: displayMonth, year: y });
+                  }}
+                  onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
+                    setInternalDate(new Date(y, displayMonth));
+                    setView("month");
+                    onChange && onChange({ month: displayMonth, year: y });
+                  })()}
+                >
+                  {y}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Default: Full Calendar (backward compatible)
   const days = Array(firstDay)
     .fill(null)
     .concat([...Array(daysInMonth)].map((_, i) => i + 1));
@@ -103,18 +323,22 @@ export default function Calendar({
 }
 
 Calendar.propTypes = {
-  year: PropTypes.number.isRequired,
-  month: PropTypes.number.isRequired,
-  firstDay: PropTypes.number.isRequired,
-  daysInMonth: PropTypes.number.isRequired,
+  mode: PropTypes.oneOf(["calendar", "month", "month-year"]),
+  value: PropTypes.object,
+  onChange: PropTypes.func,
+  // Backward compatibility props
+  year: PropTypes.number,
+  month: PropTypes.number,
+  firstDay: PropTypes.number,
+  daysInMonth: PropTypes.number,
   startDate: PropTypes.instanceOf(Date),
   endDate: PropTypes.instanceOf(Date),
-  isSameDate: PropTypes.func.isRequired,
-  isInRange: PropTypes.func.isRequired,
-  isDisabledDate: PropTypes.func.isRequired,
-  handleDateClick: PropTypes.func.isRequired,
-  handleMonthChange: PropTypes.func.isRequired,
-  setView: PropTypes.func.isRequired,
-  VIEW: PropTypes.object.isRequired,
-  currentDate: PropTypes.instanceOf(Date).isRequired,
+  isSameDate: PropTypes.func,
+  isInRange: PropTypes.func,
+  isDisabledDate: PropTypes.func,
+  handleDateClick: PropTypes.func,
+  handleMonthChange: PropTypes.func,
+  setView: PropTypes.func,
+  VIEW: PropTypes.object,
+  currentDate: PropTypes.instanceOf(Date),
 };
