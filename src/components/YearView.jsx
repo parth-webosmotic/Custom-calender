@@ -48,7 +48,11 @@ export default function YearView({
         {years.map((year) => (
           <div
             key={year}
-            className={`year ${isDisabledYear(year) ? "disabled" : ""}`}
+            className={`year${
+              isDisabledYear(year) ? " disabled" : ""
+            }${
+              currentDate.getFullYear() === year ? " selected" : ""
+            }`}
             role="button"
             tabIndex={isDisabledYear(year) ? -1 : 0}
             aria-disabled={isDisabledYear(year)}

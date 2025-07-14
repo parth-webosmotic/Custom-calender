@@ -7,6 +7,7 @@ export default function MonthView({
   setCurrentDate,
   handleMonthSelect,
   isDisabledMonth,
+  onYearClick,
 }) {
   return (
     <div className="month-view">
@@ -26,7 +27,18 @@ export default function MonthView({
         >
           ❮
         </div>
-        <div>{year}</div>
+        {onYearClick ? (
+          <button
+            type="button"
+            className="year-btn"
+            style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 'bold', fontSize: '1em', textDecoration: 'none', outline: 'none' }}
+            onClick={onYearClick}
+          >
+            {year}
+          </button>
+        ) : (
+          <div>{year}</div>
+        )}
         <div
           className="nav-btn"
           role="button"
@@ -47,7 +59,13 @@ export default function MonthView({
         {Array.from({ length: 12 }, (_, i) => (
           <div
             key={i}
-            className={`month ${isDisabledMonth(year, i) ? "disabled" : ""}`}
+            className={`month${
+              isDisabledMonth(year, i) ? " disabled" : ""
+            }${
+              currentDate.getFullYear() === year && currentDate.getMonth() === i
+                ? " selected"
+                : ""
+            }`}
             role="button"
             tabIndex={isDisabledMonth(year, i) ? -1 : 0}
             aria-disabled={isDisabledMonth(year, i)}
@@ -72,4 +90,5 @@ MonthView.propTypes = {
   setCurrentDate: PropTypes.func.isRequired,
   handleMonthSelect: PropTypes.func.isRequired,
   isDisabledMonth: PropTypes.func.isRequired,
+  onYearClick: PropTypes.func,
 };

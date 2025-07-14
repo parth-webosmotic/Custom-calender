@@ -21,7 +21,7 @@ function isDateTimeBefore(d1, t1, d2, t2) {
   return dt1 < dt2;
 }
 
-export default function DateTimeRangePicker({ hour12 = true, minuteStep = 1 }) {
+export default function DatePicker({ hour12 = true, minuteStep = 1 }) {
   // Example state for month picker
   // const [monthValue, setMonthValue] = useState({ month: new Date().getMonth() });
   // Updated state for month and date picker

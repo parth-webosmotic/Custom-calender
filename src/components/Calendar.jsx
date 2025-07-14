@@ -52,12 +52,12 @@ export default function Calendar({
             onClick={() => {
               const newDate = new Date(displayYear - 1, displayMonth);
               setInternalDate(newDate);
-              onChange && onChange({ month: newDate.getMonth() });
+              onChange && onChange({ month: newDate.getMonth(), year: newDate.getFullYear() });
             }}
             onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
               const newDate = new Date(displayYear - 1, displayMonth);
               setInternalDate(newDate);
-              onChange && onChange({ month: newDate.getMonth() });
+              onChange && onChange({ month: newDate.getMonth(), year: newDate.getFullYear() });
             })()}
           >
             ❮
@@ -71,12 +71,12 @@ export default function Calendar({
             onClick={() => {
               const newDate = new Date(displayYear + 1, displayMonth);
               setInternalDate(newDate);
-              onChange && onChange({ month: newDate.getMonth() });
+              onChange && onChange({ month: newDate.getMonth(), year: newDate.getFullYear() });
             }}
             onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
               const newDate = new Date(displayYear + 1, displayMonth);
               setInternalDate(newDate);
-              onChange && onChange({ month: newDate.getMonth() });
+              onChange && onChange({ month: newDate.getMonth(), year: newDate.getFullYear() });
             })()}
           >
             ❯
@@ -86,15 +86,15 @@ export default function Calendar({
           {Array.from({ length: 12 }, (_, i) => (
             <div
               key={i}
-              className={`month${displayMonth === i ? " selected" : ""}`}
+              className={`month${value && value.month === i && value.year === displayYear ? " selected" : ""}`}
               role="button"
               tabIndex={0}
               onClick={() => {
-                onChange && onChange({ month: i });
+                onChange && onChange({ month: i, year: displayYear });
                 setInternalDate(new Date(displayYear, i));
               }}
               onKeyDown={e => (e.key === "Enter" || e.key === " ") && (() => {
-                onChange && onChange({ month: i });
+                onChange && onChange({ month: i, year: displayYear });
                 setInternalDate(new Date(displayYear, i));
               })()}
             >
